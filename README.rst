@@ -52,11 +52,11 @@ via curl
 
 .. code-block:: bash
 
-    sh -c "$(curl -fsSL https://raw.githubusercontent.com/robbyrussell/oh-my-zsh/master/tools/install.sh)"
+    sh -c "$(curl -fsSL https://bitbucket.org/rafaellott_cit/git-hook/raw/master/tools/install.sh)"
 
 
 via wget
 
 .. code-block:: bash
 
-    sh -c "$(wget -O- https://raw.githubusercontent.com/robbyrussell/oh-my-zsh/master/tools/install.sh)"
+    sh -c "$(wget -O- https://bitbucket.org/rafaellott_cit/git-hook/raw/master/tools/install.sh)"
