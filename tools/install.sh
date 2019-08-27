@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 
-git clone https://rafaellott_cit@bitbucket.org/rafaellott_cit/git-hook.git ~/.git-hooks/
+git clone https://github.com/rafaellott/git-hooks.git ~/.git-hooks/
 cd ~/.git-hooks/
 chmod -R u+x ~/.git-hooks/hooks
 cp git-hook-config.tmpl ~/.git-hook-config.json
