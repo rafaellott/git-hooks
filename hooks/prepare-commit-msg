@@ -1,0 +1,53 @@
+#!/usr/bin/env python3
+import os
+import sys
+import subprocess
+import json
+
+# Getting the commit message
+COMMIT_MSG_FILE = sys.argv[1]
+COMMIT_MSG = None
+with open(COMMIT_MSG_FILE, "r") as f:
+    COMMIT_MSG = f.read().replace('\n', '')
+
+
+# Getting git project name
+git_cmd = "git remote get-url origin"
+resp = subprocess.run(git_cmd, stdout=subprocess.PIPE, stderr=subprocess.DEVNULL, shell=True)
+if resp.returncode > 0:
+    raise Exception("This command must be executed inside a valid git directory.")
+if resp.stdout is None:
+    raise Exception("Git remote is empty.")
+
+# Constants
+GIT_URL = resp.stdout.decode()
+PROJECT_NAME = GIT_URL.replace('\n', '').split('/')[-1].split('.')[0].lower()
+
+# Receiving the message as arg
+PREPARED_MSG = sys.argv[1]
+
+# Loading the users configuration file for git-hook
+HOME_FOLDER = os.path.expanduser("~")
+CONFIG_PATH = "{}/.git-hook-config.json".format(HOME_FOLDER)
+config_file = open(CONFIG_PATH, 'r').read()
+configs = json.loads(config_file)
+project_conf = configs.get(PROJECT_NAME)
+
+# check if project is enabled
+if not project_conf:
+    print("system exit 0")
+    sys.exit(1)
+elif COMMIT_MSG.startswith("#"):
+    print("Please commit with option '-m'.\nEx.: git commit -m '<YOUR_COMMIT_MESSAGE>'")
+    sys.exit(1)
+
+print(f'YOUR MESSAGE -> "{COMMIT_MSG}"')
+msg_split = COMMIT_MSG.split(";")
+new_msg = project_conf['format'].format(*msg_split)
+print(f'NEW MESSAGE  -> "{new_msg}"')
+
+
+with open(COMMIT_MSG_FILE, "r+") as f:
+    f.write(new_msg)
+
+sys.exit(0)
