@@ -4,3 +4,4 @@ git clone https://rafaellott_cit@bitbucket.org/rafaellott_cit/git-hook.git ~/.gi
 cd ~/.git-hooks/
 chmod a+x -R ~/.git-hooks/*
 cp git-hook-config.tmpl ~/.git-hook-config.json
+git config --global core.hooksPath ~/.git-hooks/hooks
