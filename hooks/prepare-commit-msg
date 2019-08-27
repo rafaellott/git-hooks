@@ -23,9 +23,6 @@ if resp.stdout is None:
 GIT_URL = resp.stdout.decode()
 PROJECT_NAME = GIT_URL.replace('\n', '').split('/')[-1].split('.')[0].lower()
 
-# Receiving the message as arg
-PREPARED_MSG = sys.argv[1]
-
 # Loading the users configuration file for git-hook
 HOME_FOLDER = os.path.expanduser("~")
 CONFIG_PATH = "{}/.git-hook-config.json".format(HOME_FOLDER)
@@ -35,17 +32,24 @@ project_conf = configs.get(PROJECT_NAME)
 
 # check if project is enabled
 if not project_conf:
-    print("system exit 0")
-    sys.exit(1)
+    sys.exit(0)
 elif COMMIT_MSG.startswith("#"):
     print("Please commit with option '-m'.\nEx.: git commit -m '<YOUR_COMMIT_MESSAGE>'")
     sys.exit(1)
 
-print(f'YOUR MESSAGE -> "{COMMIT_MSG}"')
-msg_split = COMMIT_MSG.split(";")
-new_msg = project_conf['format'].format(*msg_split)
-print(f'NEW MESSAGE  -> "{new_msg}"')
-
+try:
+    print('YOUR MESSAGE -> "{}"'.format(COMMIT_MSG))
+    msg_split = COMMIT_MSG.split(";")
+    new_msg = project_conf['format'].format(*msg_split)
+except IndexError:
+    error_msg = project_conf.get(
+        'help', 'Commit message not following format:\n{}'.format(project_conf['format'])
+    )
+    print(error_msg)
+    sys.exit(1)
+except Exception as e:
+    print("An error occurred: {}".format(e))
+    sys.exit(1)
 
 with open(COMMIT_MSG_FILE, "r+") as f:
     f.write(new_msg)

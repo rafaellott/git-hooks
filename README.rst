@@ -52,11 +52,21 @@ via curl
 
 .. code-block:: bash
 
-    sh -c "$(curl -fsSL https://bitbucket.org/rafaellott_cit/git-hook/raw/master/tools/install.sh)"
+    sh -c "$(curl -fsSL https://raw.githubusercontent.com/rafaellott/git-hooks/master/tools/install.sh)"
 
 
 via wget
 
 .. code-block:: bash
 
-    sh -c "$(wget -O- https://bitbucket.org/rafaellott_cit/git-hook/raw/master/tools/install.sh)"
+    sh -c "$(wget -O- https://raw.githubusercontent.com/rafaellott/git-hooks/master/tools/install.sh)"
+
+
+How to upgrade
+==============
+
+To upgrade, just run the command bellow:
+
+.. code-block:: bash
+
+    ~/.git-hooks/tools/update.sh
