@@ -12,10 +12,9 @@ How it works
 
 The **prepare-commit-msg** is a hook that is executed before the commit be complete.
 
-Currently, this hook will format the commit message to follow the standard in **.git-hook-config
-.json**
+Currently, this hook will format the commit message to follow the standard in **.git-hooks-config.json**
 
-Configuration format in **~/.git-hook-config.json**
+Configuration format in **~/.git-hooks-config.json**
 
 .. code-block::
 
@@ -30,7 +29,7 @@ Example:
 .. code-block::
 
     {
-        "git-hook": {
+        "git-hooks": {
             "format": "[TEST-{}][TEST-{}] {}"
         }
     }

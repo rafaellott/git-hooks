@@ -25,7 +25,7 @@ PROJECT_NAME = GIT_URL.replace('\n', '').split('/')[-1].split('.')[0].lower()
 
 # Loading the users configuration file for git-hook
 HOME_FOLDER = os.path.expanduser("~")
-CONFIG_PATH = "{}/.git-hook-config.json".format(HOME_FOLDER)
+CONFIG_PATH = "{}/.git-hooks-config.json".format(HOME_FOLDER)
 config_file = open(CONFIG_PATH, 'r').read()
 configs = json.loads(config_file)
 project_conf = configs.get(PROJECT_NAME)
