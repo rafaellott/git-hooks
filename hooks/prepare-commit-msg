@@ -26,19 +26,22 @@ if not CMD_RESPONSE.stdout:
 # Constants
 GIT_URL = CMD_RESPONSE.stdout.decode().strip()
 
-GIT_REPO_NAME_PATTERN = re.fullmatch(r".*\/(.*)\.git", GIT_URL)
+GIT_REPO_NAME_PATTERN = re.fullmatch(r".*\/(.*)\/(.*)\.git", GIT_URL)
 
 if not GIT_REPO_NAME_PATTERN:
     raise ValueError('Invalid git URL where is the repo name')
-PROJECT_NAME = GIT_REPO_NAME_PATTERN.group(1)
+USER_NAME, PROJECT_NAME = GIT_REPO_NAME_PATTERN.groups()
 
 # Loading the users configuration file for git-hook
 CONFIG_FILE_STREAM = Path.home().joinpath(".git-hooks-config.json").open(mode="r")
 CONFIGS = json.load(CONFIG_FILE_STREAM)
-PROJECT_CONF = CONFIGS.get(PROJECT_NAME)
+
+project_conf = CONFIGS.get(USER_NAME)
+if not project_conf:
+    project_conf = CONFIGS.get(PROJECT_NAME)
 
 # check if project is enabled
-if not PROJECT_CONF:
+if not project_conf:
     sys.exit(0)
 elif COMMIT_MSG.startswith("#"):
     raise ValueError("Please commit with option '-m'.\nEx.: git commit -m '<YOUR_COMMIT_MESSAGE>'")
@@ -46,10 +49,10 @@ elif COMMIT_MSG.startswith("#"):
 try:
     print('YOUR MESSAGE -> "{}"'.format(COMMIT_MSG))
     MESSAGE_SPLIT = COMMIT_MSG.split(";")
-    NEW_MESSAGE = PROJECT_CONF['format'].format(*MESSAGE_SPLIT)
+    NEW_MESSAGE = project_conf['format'].format(*MESSAGE_SPLIT)
 except IndexError:
-    ERROR_MESSAGE = PROJECT_CONF.get(
-        'help', 'Commit message not following format:\n{}'.format(PROJECT_CONF['format'])
+    ERROR_MESSAGE = project_conf.get(
+        'help', 'Commit message not following format:\n{}'.format(project_conf['format'])
     )
     raise ValueError(ERROR_MESSAGE)
 except Exception as error:
