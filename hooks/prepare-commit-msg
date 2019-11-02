@@ -1,57 +1,60 @@
 #!/usr/bin/env python3
-import os
-import sys
-import subprocess
 import json
+import re
+import subprocess
+import sys
+from pathlib import Path
 
 # Getting the commit message
 COMMIT_MSG_FILE = sys.argv[1]
-COMMIT_MSG = None
-with open(COMMIT_MSG_FILE, "r") as f:
-    COMMIT_MSG = f.read().replace('\n', '')
 
+COMMIT_MSG = ''.join(Path(COMMIT_MSG_FILE).open(mode="r").readlines())
 
 # Getting git project name
-git_cmd = "git remote get-url origin"
-resp = subprocess.run(git_cmd, stdout=subprocess.PIPE, stderr=subprocess.DEVNULL, shell=True)
-if resp.returncode > 0:
-    raise Exception("This command must be executed inside a valid git directory.")
-if resp.stdout is None:
-    raise Exception("Git remote is empty.")
+GIT_CMD = "git remote get-url origin"
+CMD_RESPONSE = subprocess.run(
+    GIT_CMD,
+    stdout=subprocess.PIPE,
+    stderr=subprocess.DEVNULL,
+    shell=True
+)
+if CMD_RESPONSE.returncode > 0:
+    raise ValueError("This command must be executed inside a valid git directory.")
+if not CMD_RESPONSE.stdout:
+    raise ValueError("Git remote is empty.")
 
 # Constants
-GIT_URL = resp.stdout.decode()
-PROJECT_NAME = GIT_URL.replace('\n', '').split('/')[-1].split('.')[0].lower()
+GIT_URL = CMD_RESPONSE.stdout.decode().strip()
+
+GIT_REPO_NAME_PATTERN = re.fullmatch(r".*\/(.*)\.git", GIT_URL)
+
+if not GIT_REPO_NAME_PATTERN:
+    raise ValueError('Invalid git URL where is the repo name')
+PROJECT_NAME = GIT_REPO_NAME_PATTERN.group(1)
 
 # Loading the users configuration file for git-hook
-HOME_FOLDER = os.path.expanduser("~")
-CONFIG_PATH = "{}/.git-hooks-config.json".format(HOME_FOLDER)
-config_file = open(CONFIG_PATH, 'r').read()
-configs = json.loads(config_file)
-project_conf = configs.get(PROJECT_NAME)
+CONFIG_FILE_STREAM = Path.home().joinpath(".git-hooks-config.json").open(mode="r")
+CONFIGS = json.load(CONFIG_FILE_STREAM)
+PROJECT_CONF = CONFIGS.get(PROJECT_NAME)
 
 # check if project is enabled
-if not project_conf:
+if not PROJECT_CONF:
     sys.exit(0)
 elif COMMIT_MSG.startswith("#"):
-    print("Please commit with option '-m'.\nEx.: git commit -m '<YOUR_COMMIT_MESSAGE>'")
-    sys.exit(1)
+    raise ValueError("Please commit with option '-m'.\nEx.: git commit -m '<YOUR_COMMIT_MESSAGE>'")
 
 try:
     print('YOUR MESSAGE -> "{}"'.format(COMMIT_MSG))
-    msg_split = COMMIT_MSG.split(";")
-    new_msg = project_conf['format'].format(*msg_split)
+    MESSAGE_SPLIT = COMMIT_MSG.split(";")
+    NEW_MESSAGE = PROJECT_CONF['format'].format(*MESSAGE_SPLIT)
 except IndexError:
-    error_msg = project_conf.get(
-        'help', 'Commit message not following format:\n{}'.format(project_conf['format'])
+    ERROR_MESSAGE = PROJECT_CONF.get(
+        'help', 'Commit message not following format:\n{}'.format(PROJECT_CONF['format'])
     )
-    print(error_msg)
-    sys.exit(1)
-except Exception as e:
-    print("An error occurred: {}".format(e))
-    sys.exit(1)
+    raise ValueError(ERROR_MESSAGE)
+except Exception as error:
+    raise ValueError("An error occurred: {}".format(error))
 
-with open(COMMIT_MSG_FILE, "r+") as f:
-    f.write(new_msg)
+Path(COMMIT_MSG_FILE).open(mode="r+").write(NEW_MESSAGE)
 
 sys.exit(0)
