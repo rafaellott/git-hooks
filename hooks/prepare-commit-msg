@@ -26,7 +26,7 @@ if not CMD_RESPONSE.stdout:
 # Constants
 GIT_URL = CMD_RESPONSE.stdout.decode().strip()
 
-GIT_REPO_NAME_PATTERN = re.fullmatch(r".*\/(.*)\/(.*)\.git", GIT_URL)
+GIT_REPO_NAME_PATTERN = re.fullmatch(r".*[\/|\:](.*)\/(.*)\.git", GIT_URL)
 
 if not GIT_REPO_NAME_PATTERN:
     raise ValueError('Invalid git URL where is the repo name')
