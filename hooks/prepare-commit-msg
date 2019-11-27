@@ -40,10 +40,10 @@ project_conf = CONFIGS.get(USER_NAME)
 if not project_conf:
     project_conf = CONFIGS.get(PROJECT_NAME)
 
-EXCLUDE_PROJECT = (USER_NAME or PROJECT_NAME) in CONFIGS.get('excludes', ())
+EXCLUDE_LIST = (USER_NAME or PROJECT_NAME) in CONFIGS.get('excludes', ())
 
 # check if project is enabled
-if not project_conf or EXCLUDE_PROJECT:
+if not project_conf or EXCLUDE_LIST:
     sys.exit(0)
 elif COMMIT_MSG.startswith("#"):
     raise ValueError("Please commit with option '-m'.\nEx.: git commit -m '<YOUR_COMMIT_MESSAGE>'")
