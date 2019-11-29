@@ -21,7 +21,8 @@ Configuration format in **~/.git-hooks-config.json**
     {
         "<git_project_name>": {
             "format": "<format_message>"
-        }
+        },
+        "excludes": ["<repo-name>"]
     }
 
 Example:
@@ -31,7 +32,8 @@ Example:
     {
         "git-hooks": {
             "format": "[TEST-{}][TEST-{}] {}"
-        }
+        },
+        "excludes": ["my-repo-name", "my-user-name"]
     }
 
 
