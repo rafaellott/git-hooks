@@ -42,8 +42,10 @@ if not project_conf:
 
 EXCLUDE_LIST = (USER_NAME or PROJECT_NAME) in CONFIGS.get('excludes', ())
 
-# check if project is enabled
-if not project_conf or EXCLUDE_LIST:
+MERGE_MESSAGE = re.match(r'^Merge|merge', COMMIT_MSG)
+
+# check if by pass messages
+if not project_conf or EXCLUDE_LIST or MERGE_MESSAGE:
     sys.exit(0)
 elif COMMIT_MSG.startswith("#"):
     raise ValueError("Please commit with option '-m'.\nEx.: git commit -m '<YOUR_COMMIT_MESSAGE>'")
